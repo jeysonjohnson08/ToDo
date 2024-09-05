@@ -1,0 +1,21 @@
+const gettask = (req,res)=>{
+    res.send("all tasks")
+}
+
+const createtask = (req,res)=>{
+    res.json(req.body);
+}
+
+const updatetask = (req,res)=>{
+    res.send("task updated")
+}
+
+const patchtask = (req,res)=>{
+    res.send("task patched")
+}
+
+const deletetask = (req,res)=>{
+    res.send("task deleted")
+}
+
+module.exports  = {gettask, createtask, updatetask, patchtask, deletetask}
