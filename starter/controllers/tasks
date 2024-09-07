@@ -9,7 +9,7 @@ const gettask = (req,res)=>{
 
 const createtask = async(req,res)=>{
     const task = await Task.create(req.body);
-    res.json({task});
+    res.json(task);
 }
 
 const updatetask = (req,res)=>{
