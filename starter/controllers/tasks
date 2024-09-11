@@ -3,45 +3,37 @@ const asyncwrapper = require("../middleware/asyncwrapper")
 
 //getall tasks
 
-const getalltask = asyncwrapper(async(req,res)=>{
-    
-    const tasks = await Task.find({});
-    res.status(201).json({tasks})
-    
-}
 
-)
+const getalltask = asyncwrapper(async (req, res) => {
+    const tasks = await Task.find({});
+    res.status(201).json({ tasks });
+});
+
 
   
 
-const gettask = async(req,res)=>{
-    try{
+const gettask = asyncwrapper(async(req,res)=>{
+    
 
     const task = await Task.findOne({_id:req.params.id});
     if(!task){
         res.status(404).json({msg: `no task with id: ${req.params.id}`})
     }
     res.status(201).json({task})
-    }
-    catch(error){
-        res.status(500).json({"err":error})
-    }
-}
+    
+})
 // queries are not proimises but they still have the then() function for 
 // async/await for convineence 
-const createtask = async(req,res)=>{
-    try{
+    const createtask =  asyncwrapper(async(req,res)=>{
     const task = await Task.create(req.body);
     res.json(task);
-    }
-    catch(error){
-        res.status(500).json({"err":error})
-    }
+    
 }
+)
 // update
 
-const updatetask = async (req, res) => {
-    try {
+const updatetask = asyncwrapper(async (req, res) => {
+    
       const updatedTask = await Task.findOneAndUpdate(
         { _id: req.params.id },
         req.body,
@@ -55,30 +47,25 @@ const updatetask = async (req, res) => {
         return res.status(404).json({ msg: `No task with id: ${req.params.id}` });
       }
       res.status(200).json({task : updatedTask});
-    } catch (error) {
-      console.error(error);
-      res.status(500).json({ error: error.message });
-    }
-};
+    
+}
+)
 
 
-const edittask = async(req,res)=>{
+const edittask = asyncwrapper(async(req,res)=>{
     const updatedata = {"name":req.body.name,
         "completed": req.body.completed == undefined ? undefined : req.body.completed
     }
     console.log(updatedata)
-    try{
+   
     const updatedtask = await Task.findOneAndUpdate({_id:req.params.id},updatedata,{new:true, runValidators:true,overwrite:true})
     if(!updatedtask){
         return res.status(404).json({msg:"no task with the entered id"})
     }
     res.status(200).json(updatedtask)
-}catch(error){
-    res.status(500).json({"err":error})
-}
 
 }
-  
+)
 
 
 //patch
@@ -103,15 +90,10 @@ const edittask = async(req,res)=>{
 
 // delete
 
-const deletetask = async (req,res)=>{
-    try{
+const deletetask = asyncwrapper(async (req,res)=>{
     const result = await Task.deleteOne({_id: req.params.id});
     res.status(201).json({"delete status": "successful"})
-    }
-    catch(error){
-        res.status(500).json({"error":error})
-    }
-
 }
+)
 
 module.exports  = {getalltask, gettask, createtask, updatetask, deletetask,edittask} //patchtask
