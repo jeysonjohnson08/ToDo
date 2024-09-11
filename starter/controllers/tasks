@@ -1,6 +1,6 @@
 const Task = require("../models/task")
 const asyncwrapper = require("../middleware/asyncwrapper")
-
+const createCustomError = require("../middleware/customerrorclass")
 //getall tasks
 
 
@@ -12,16 +12,17 @@ const getalltask = asyncwrapper(async (req, res) => {
 
   
 
-const gettask = asyncwrapper(async(req,res)=>{
-    
-
-    const task = await Task.findOne({_id:req.params.id});
-    if(!task){
-        res.status(404).json({msg: `no task with id: ${req.params.id}`})
+const gettask = asyncwrapper(async (req, res, next) => {
+    const task = await Task.findOne({ _id: req.params.id });
+    if (!task) {
+        return next(createCustomError("The task is not found",404))
+        // const err = new Error(`No task with id: ${req.params.id}`);
+        // err.status = 404;
+        // return next(err); // Pass the error to the error handler
     }
-    res.status(201).json({task})
-    
-})
+    res.status(200).json({ task }); // Use 200 for successful retrieval
+});
+
 // queries are not proimises but they still have the then() function for 
 // async/await for convineence 
     const createtask =  asyncwrapper(async(req,res)=>{
