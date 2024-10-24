@@ -1,0 +1,100 @@
+const Task = require("../models/task")
+const asyncwrapper = require("../middleware/asyncwrapper")
+const createCustomError = require("../middleware/customerrorclass")
+//getall tasks
+
+
+const getalltask = asyncwrapper(async (req, res) => {
+    const tasks = await Task.find({});
+    res.status(201).json({ tasks });
+});
+
+
+  
+
+const gettask = asyncwrapper(async (req, res, next) => {
+    const task = await Task.findOne({ _id: req.params.id });
+    if (!task) {
+        return next(createCustomError("The task is not found",404))
+        // const err = new Error(`No task with id: ${req.params.id}`);
+        // err.status = 404;
+        // return next(err); // Pass the error to the error handler
+    }
+    res.status(200).json({ task }); // Use 200 for successful retrieval
+});
+
+// queries are not proimises but they still have the then() function for 
+// async/await for convineence 
+    const createtask =  asyncwrapper(async(req,res)=>{
+    const task = await Task.create(req.body);
+    res.json(task);
+    
+}
+)
+// update
+
+const updatetask = asyncwrapper(async (req, res) => {
+    
+      const updatedTask = await Task.findOneAndUpdate(
+        { _id: req.params.id },
+        req.body,
+        {
+          new: true,          // Return the updated document
+          runValidators: true // Validate the new data according to the schema
+        }
+      );
+  
+      if (!updatedTask) {
+        return res.status(404).json({ msg: `No task with id: ${req.params.id}` });
+      }
+      res.status(200).json({task : updatedTask});
+    
+}
+)
+
+
+const edittask = asyncwrapper(async(req,res)=>{
+    const updatedata = {"name":req.body.name,
+        "completed": req.body.completed == undefined ? undefined : req.body.completed
+    }
+    console.log(updatedata)
+   
+    const updatedtask = await Task.findOneAndUpdate({_id:req.params.id},updatedata,{new:true, runValidators:true,overwrite:true})
+    if(!updatedtask){
+        return res.status(404).json({msg:"no task with the entered id"})
+    }
+    res.status(200).json(updatedtask)
+
+}
+)
+
+
+//patch
+
+// const patchtask = async(req,res)=>{
+//     try{
+// const updatedTask = await Task.findOneAndUpdate({_id:req.params.id},req.body,{new:true,runValidators:true})
+// if(!updatedtask){
+//     res.status(404).json({msg: `no task with id: ${req.params.id}`})
+// }
+// /*
+// new: true: This ensures that the response will include the updated document instead of the old one.
+// runValidators: true: Ensures that the update respects the schema validation rules.
+// */
+// res.status(200).json(updatedTask)
+//     }
+//     catch(error){
+//         res.status(500).json({"err":error});
+//     }
+// }
+
+
+// delete
+
+const deletetask = asyncwrapper(async (req,res)=>{
+    const result = await Task.deleteOne({_id: req.params.id});
+    res.status(201).json({"delete status": "successful"})
+}
+)
+
+module.exports  = {getalltask, gettask, createtask, updatetask, deletetask,edittask} //patchtask
